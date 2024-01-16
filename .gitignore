@@ -1,0 +1,8 @@
+# IDE & Editor
+.vscode/*
+!.vscode/settings.example.json
+!.vscode/extensions.json
+
+# Zig
+zig-cache/
+zig-out/
