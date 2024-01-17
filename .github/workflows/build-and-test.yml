@@ -1,0 +1,46 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - LICENSE
+      - README.md
+      - .github/**
+      - '!.github/workflows/build-and-test.yml'
+      - .vscode/**
+  pull_request:
+    paths-ignore:
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - LICENSE
+      - README.md
+      - .github/**
+      - '!.github/workflows/build-and-test.yml'
+      - .vscode/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build zig project and run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup zig
+        uses: goto-bus-stop/setup-zig@v2
+
+      - name: Lint
+        run: zig fmt --check .
+
+      - name: Build and test
+        run: zig build test
