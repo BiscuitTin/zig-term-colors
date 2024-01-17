@@ -1,3 +1,3 @@
-pub const CSI = "\x1b[";
+pub const CSI: []const u8 = "\x1b[";
 
-pub const COLOR_16_FORMAT_STRING = CSI ++ "{d}m";
+pub const COLOR_16_FORMAT_STRING: []const u8 = CSI ++ "{d}m";
