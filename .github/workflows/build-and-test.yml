@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   build-and-test:
-    name: Build zig project and run tests
+    name: Build & test w/zig
     runs-on: ubuntu-latest
     strategy:
       matrix:
