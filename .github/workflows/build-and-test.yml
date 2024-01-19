@@ -11,7 +11,7 @@ on:
       - LICENSE
       - README.md
       - .github/**
-      - '!.github/workflows/build-and-test-0.11.0.yml'
+      - '!.github/workflows/build-and-test.yml'
       - .vscode/**
   pull_request:
     paths-ignore:
@@ -21,7 +21,7 @@ on:
       - LICENSE
       - README.md
       - .github/**
-      - '!.github/workflows/build-and-test-0.11.0.yml'
+      - '!.github/workflows/build-and-test.yml'
       - .vscode/**
 
 concurrency:
@@ -32,6 +32,9 @@ jobs:
   build-and-test:
     name: Build zig project and run tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['master', '0.11.0']
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +42,7 @@ jobs:
       - name: Setup zig
         uses: goto-bus-stop/setup-zig@v2
         with:
-          version: 0.11.0
+          version: ${{ matrix.version }}
 
       - name: Lint
         run: zig fmt --check .
