@@ -5,23 +5,19 @@ const termColors = @import("../lib.zig");
 const testing = std.testing;
 const ColorParams = enums.ColorParams;
 const Colors = termColors.Colors;
-const comptime_colors = termColors.ComptimeColors;
+const comptime_colors = termColors.comptime_colors;
 
 test "colors default" {
     var buffer: [8]u8 = undefined;
     var fbs = std.io.fixedBufferStream(&buffer);
-
     const colors = Colors{ .escape_codes = {} };
-
     {
         // default foreground text
         const expected = "\x1b[39m";
         try colors.default(fbs.writer(), .foreground);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
-
     fbs.reset();
-
     {
         // default background text
         const expected = "\x1b[49m";
@@ -33,40 +29,281 @@ test "colors default" {
 test "colors color16" {
     var buffer: [8]u8 = undefined;
     var fbs = std.io.fixedBufferStream(&buffer);
-
     const colors = Colors{ .escape_codes = {} };
-
     {
         // normal red foreground text
         const expected = "\x1b[31m";
         try colors.color16(fbs.writer(), .red, .foreground);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
-
     fbs.reset();
-
     {
         // normal green background text
         const expected = "\x1b[42m";
         try colors.color16(fbs.writer(), .green, .background);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
-
     fbs.reset();
-
     {
         // bright blue foreground text
         const expected = "\x1b[94m";
         try colors.color16(fbs.writer(), .bright_blue, .foreground);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
-
     fbs.reset();
-
     {
         // bright magenta background text
         const expected = "\x1b[105m";
         try colors.color16(fbs.writer(), .bright_magenta, .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "colors print" {
+    var buffer: [40]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        // normal red foreground text
+        const expected = "\x1b[31mHello year 2024 world!\x1b[39m";
+        try colors.print(fbs.writer(), .{ .red, .foreground }, "Hello year {d} world!", .{2024});
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal green background text
+        const expected = "\x1b[42mHello year 2024 world!\x1b[49m";
+        try colors.print(fbs.writer(), .{ .green, .background }, "Hello year {d} world!", .{2024});
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright blue foreground text
+        const expected = "\x1b[94mHello year 2024 world!\x1b[39m";
+        try colors.print(fbs.writer(), .{ .bright_blue, .foreground }, "Hello year {d} world!", .{2024});
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright magenta background text
+        const expected = "\x1b[105mHello year 2024 world!\x1b[49m";
+        try colors.print(fbs.writer(), .{ .bright_magenta, .background }, "Hello year {d} world!", .{2024});
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "colors set color" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        // normal red foreground text
+        const expected = "\x1b[31m";
+        try colors.setColor(fbs.writer(), .red, .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal green background text
+        const expected = "\x1b[42m";
+        try colors.setColor(fbs.writer(), .green, .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright blue foreground text
+        const expected = "\x1b[94m";
+        try colors.setColor(fbs.writer(), .bright_blue, .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright magenta background text
+        const expected = "\x1b[105m";
+        try colors.setColor(fbs.writer(), .bright_magenta, .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "colors fg" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        // normal black text
+        const expected = "\x1b[30m";
+        try colors.fg(fbs.writer(), .black);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal white text
+        const expected = "\x1b[37m";
+        try colors.fg(fbs.writer(), .white);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright black text
+        const expected = "\x1b[90m";
+        try colors.fg(fbs.writer(), .bright_black);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright white text
+        const expected = "\x1b[97m";
+        try colors.fg(fbs.writer(), .bright_white);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "colors bg" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        // normal black background
+        const expected = "\x1b[40m";
+        try colors.bg(fbs.writer(), .black);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal white background
+        const expected = "\x1b[47m";
+        try colors.bg(fbs.writer(), .white);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright black background
+        const expected = "\x1b[100m";
+        try colors.bg(fbs.writer(), .bright_black);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright white background
+        const expected = "\x1b[107m";
+        try colors.bg(fbs.writer(), .bright_white);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "16 colors" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        // normal black foreground text
+        const expected = "\x1b[30m";
+        try colors.black(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright black background text
+        const expected = "\x1b[100m";
+        try colors.brightBlack(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal red foreground text
+        const expected = "\x1b[31m";
+        try colors.red(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright red background text
+        const expected = "\x1b[101m";
+        try colors.brightRed(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal green foreground text
+        const expected = "\x1b[32m";
+        try colors.green(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright green background text
+        const expected = "\x1b[102m";
+        try colors.brightGreen(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal yellow foreground text
+        const expected = "\x1b[33m";
+        try colors.yellow(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright yellow background text
+        const expected = "\x1b[103m";
+        try colors.brightYellow(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal blue foreground text
+        const expected = "\x1b[34m";
+        try colors.blue(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright blue background text
+        const expected = "\x1b[104m";
+        try colors.brightBlue(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal magenta foreground text
+        const expected = "\x1b[35m";
+        try colors.magenta(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright magenta background text
+        const expected = "\x1b[105m";
+        try colors.brightMagenta(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal cyan foreground text
+        const expected = "\x1b[36m";
+        try colors.cyan(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright cyan background text
+        const expected = "\x1b[106m";
+        try colors.brightCyan(fbs.writer(), .background);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // normal white foreground text
+        const expected = "\x1b[37m";
+        try colors.white(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // bright white background text
+        const expected = "\x1b[107m";
+        try colors.brightWhite(fbs.writer(), .background);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
 }
@@ -195,25 +432,22 @@ test "comptime colors bg" {
 }
 
 test "create colors function" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
     {
         // no color
         const tty_config = std.io.tty.Config{ .no_color = {} };
         const colors = termColors.createColors(tty_config);
 
-        var buffer: [8]u8 = undefined;
-        var fbs = std.io.fixedBufferStream(&buffer);
-
         const expected = "";
         try colors.default(fbs.writer(), .foreground);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
+    fbs.reset();
     {
         // escape codes
         const tty_config = std.io.tty.Config{ .escape_codes = {} };
         const colors = termColors.createColors(tty_config);
-
-        var buffer: [8]u8 = undefined;
-        var fbs = std.io.fixedBufferStream(&buffer);
 
         const expected = "\x1b[39m";
         try colors.default(fbs.writer(), .foreground);
