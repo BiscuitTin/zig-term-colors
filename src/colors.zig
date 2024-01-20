@@ -1,9 +1,7 @@
 const std = @import("std");
-const consts = @import("consts.zig");
 const enums = @import("enums.zig");
 
-const CSI = consts.CSI;
-const COLOR_16_FORMAT_STRING = consts.COLOR_16_FORMAT_STRING;
+const CSI: []const u8 = "\x1b[";
 
 const Config = std.io.tty.Config;
 const Color = enums.Color;
@@ -36,7 +34,7 @@ pub const Colors = union(enum) {
                     .foreground => color_number,
                     .background => color_number + 10,
                 };
-                try std.fmt.format(writer, COLOR_16_FORMAT_STRING, .{color_code});
+                try std.fmt.format(writer, "{s}{d}m", .{ CSI, color_code });
             },
         };
     }
@@ -108,6 +106,50 @@ pub const Colors = union(enum) {
     pub fn brightWhite(conf: Colors, writer: anytype, text: TextColor) !void {
         return color16(conf, writer, .bright_white, text);
     }
+
+    pub fn reset(conf: Colors, writer: anytype) !void {
+        nosuspend switch (conf) {
+            .no_color => return,
+            .escape_codes => {
+                const str: []const u8 = CSI ++ "0m";
+                try writer.writeAll(str);
+            },
+        };
+    }
+
+    inline fn style(conf: Colors, writer: anytype, set: bool, comptime open: []const u8, comptime close: []const u8) !void {
+        nosuspend switch (conf) {
+            .no_color => return,
+            .escape_codes => {
+                const str: []const u8 = if (set) open else close;
+                try std.fmt.format(writer, "{s}{s}", .{ CSI, str });
+            },
+        };
+    }
+    pub fn bold(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "1m", "22m");
+    }
+    pub fn dim(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "2m", "22m");
+    }
+    pub fn italic(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "3m", "23m");
+    }
+    pub fn underline(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "4m", "24m");
+    }
+    pub fn blink(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "5m", "25m");
+    }
+    pub fn inverse(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "7m", "27m");
+    }
+    pub fn hidden(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "8m", "28m");
+    }
+    pub fn strikethrough(conf: Colors, writer: anytype, set: bool) !void {
+        return style(conf, writer, set, "9m", "29m");
+    }
 };
 
 pub const comptime_colors = struct {
@@ -125,7 +167,7 @@ pub const comptime_colors = struct {
                 .foreground => color_number,
                 .background => color_number + 10,
             };
-            return std.fmt.comptimePrint(COLOR_16_FORMAT_STRING, .{color_code});
+            return std.fmt.comptimePrint("{s}{d}m", .{ CSI, color_code });
         }
     }
 
@@ -194,6 +236,39 @@ pub const comptime_colors = struct {
     }
     pub inline fn brightWhite(comptime text: TextColor) []const u8 {
         comptime return color16(.bright_white, text);
+    }
+
+    pub inline fn reset() []const u8 {
+        comptime return CSI ++ "0m";
+    }
+
+    // font styles
+    inline fn style(comptime set: bool, comptime open: []const u8, comptime close: []const u8) []const u8 {
+        comptime return CSI ++ if (set) open else close;
+    }
+    pub inline fn bold(comptime set: bool) []const u8 {
+        comptime return style(set, "1m", "22m");
+    }
+    pub inline fn dim(comptime set: bool) []const u8 {
+        comptime return style(set, "2m", "22m");
+    }
+    pub inline fn italic(comptime set: bool) []const u8 {
+        comptime return style(set, "3m", "23m");
+    }
+    pub inline fn underline(comptime set: bool) []const u8 {
+        comptime return style(set, "4m", "24m");
+    }
+    pub inline fn blink(comptime set: bool) []const u8 {
+        comptime return style(set, "5m", "25m");
+    }
+    pub inline fn inverse(comptime set: bool) []const u8 {
+        comptime return style(set, "7m", "27m");
+    }
+    pub inline fn hidden(comptime set: bool) []const u8 {
+        comptime return style(set, "8m", "28m");
+    }
+    pub inline fn strikethrough(comptime set: bool) []const u8 {
+        comptime return style(set, "9m", "29m");
     }
 };
 
