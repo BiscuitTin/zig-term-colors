@@ -1,5 +1,5 @@
 pub const Colors = @import("colors.zig").Colors;
-pub const ComptimeColors = @import("colors.zig").ComptimeColors;
+pub const comptime_colors = @import("colors.zig").comptime_colors;
 pub const createColors = @import("colors.zig").createColors;
 
 pub const utils = @import("utils.zig");
