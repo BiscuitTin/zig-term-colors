@@ -308,6 +308,134 @@ test "16 colors" {
     }
 }
 
+test "reset" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        const expected = "\x1b[0m";
+        try colors.reset(fbs.writer());
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "font styles" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const colors = Colors{ .escape_codes = {} };
+    {
+        // bold text
+        const expected = "\x1b[1m";
+        try colors.bold(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // dim text
+        const expected = "\x1b[2m";
+        try colors.dim(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // italic text
+        const expected = "\x1b[3m";
+        try colors.italic(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // underline text
+        const expected = "\x1b[4m";
+        try colors.underline(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // blink text
+        const expected = "\x1b[5m";
+        try colors.blink(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // inverse text
+        const expected = "\x1b[7m";
+        try colors.inverse(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // hidden text
+        const expected = "\x1b[8m";
+        try colors.hidden(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // strikethrough text
+        const expected = "\x1b[9m";
+        try colors.strikethrough(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no bold text
+        const expected = "\x1b[22m";
+        try colors.bold(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no dim text
+        const expected = "\x1b[22m";
+        try colors.dim(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no italic text
+        const expected = "\x1b[23m";
+        try colors.italic(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no underline text
+        const expected = "\x1b[24m";
+        try colors.underline(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no blink text
+        const expected = "\x1b[25m";
+        try colors.blink(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no inverse text
+        const expected = "\x1b[27m";
+        try colors.inverse(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no hidden text
+        const expected = "\x1b[28m";
+        try colors.hidden(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no strikethrough text
+        const expected = "\x1b[29m";
+        try colors.strikethrough(fbs.writer(), false);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
 test "comptime colors default" {
     {
         // default foreground text
@@ -526,6 +654,111 @@ test "comptime 16 colors" {
         // bright white background text
         const expected = "\x1b[107m";
         const actual = comptime_colors.brightWhite(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+}
+
+test "comptime reset" {
+    const expected = "\x1b[0m";
+    const actual = comptime_colors.reset();
+    try testing.expectEqualStrings(expected, actual);
+}
+
+test "comptime font styles" {
+    {
+        // bold text
+        const expected = "\x1b[1m";
+        const actual = comptime_colors.bold(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // dim text
+        const expected = "\x1b[2m";
+        const actual = comptime_colors.dim(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // italic text
+        const expected = "\x1b[3m";
+        const actual = comptime_colors.italic(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // underline text
+        const expected = "\x1b[4m";
+        const actual = comptime_colors.underline(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // blink text
+        const expected = "\x1b[5m";
+        const actual = comptime_colors.blink(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // inverse text
+        const expected = "\x1b[7m";
+        const actual = comptime_colors.inverse(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // hidden text
+        const expected = "\x1b[8m";
+        const actual = comptime_colors.hidden(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // strikethrough text
+        const expected = "\x1b[9m";
+        const actual = comptime_colors.strikethrough(true);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no bold text
+        const expected = "\x1b[22m";
+        const actual = comptime_colors.bold(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no dim text
+        const expected = "\x1b[22m";
+        const actual = comptime_colors.dim(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no italic text
+        const expected = "\x1b[23m";
+        const actual = comptime_colors.italic(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no underline text
+        const expected = "\x1b[24m";
+        const actual = comptime_colors.underline(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no blink text
+        const expected = "\x1b[25m";
+        const actual = comptime_colors.blink(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no inverse text
+        const expected = "\x1b[27m";
+        const actual = comptime_colors.inverse(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no hidden text
+        const expected = "\x1b[28m";
+        const actual = comptime_colors.hidden(false);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // no strikethrough text
+        const expected = "\x1b[29m";
+        const actual = comptime_colors.strikethrough(false);
         try testing.expectEqualStrings(expected, actual);
     }
 }
