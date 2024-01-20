@@ -431,6 +431,105 @@ test "comptime colors bg" {
     }
 }
 
+test "comptime 16 colors" {
+    {
+        // normal black foreground text
+        const expected = "\x1b[30m";
+        const actual = comptime_colors.black(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright black background text
+        const expected = "\x1b[100m";
+        const actual = comptime_colors.brightBlack(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal red foreground text
+        const expected = "\x1b[31m";
+        const actual = comptime_colors.red(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright red background text
+        const expected = "\x1b[101m";
+        const actual = comptime_colors.brightRed(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal green foreground text
+        const expected = "\x1b[32m";
+        const actual = comptime_colors.green(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright green background text
+        const expected = "\x1b[102m";
+        const actual = comptime_colors.brightGreen(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal yellow foreground text
+        const expected = "\x1b[33m";
+        const actual = comptime_colors.yellow(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright yellow background text
+        const expected = "\x1b[103m";
+        const actual = comptime_colors.brightYellow(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal blue foreground text
+        const expected = "\x1b[34m";
+        const actual = comptime_colors.blue(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright blue background text
+        const expected = "\x1b[104m";
+        const actual = comptime_colors.brightBlue(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal magenta foreground text
+        const expected = "\x1b[35m";
+        const actual = comptime_colors.magenta(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright magenta background text
+        const expected = "\x1b[105m";
+        const actual = comptime_colors.brightMagenta(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal cyan foreground text
+        const expected = "\x1b[36m";
+        const actual = comptime_colors.cyan(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright cyan background text
+        const expected = "\x1b[106m";
+        const actual = comptime_colors.brightCyan(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // normal white foreground text
+        const expected = "\x1b[37m";
+        const actual = comptime_colors.white(.foreground);
+        try testing.expectEqualStrings(expected, actual);
+    }
+    {
+        // bright white background text
+        const expected = "\x1b[107m";
+        const actual = comptime_colors.brightWhite(.background);
+        try testing.expectEqualStrings(expected, actual);
+    }
+}
+
 test "create colors function" {
     var buffer: [8]u8 = undefined;
     var fbs = std.io.fixedBufferStream(&buffer);

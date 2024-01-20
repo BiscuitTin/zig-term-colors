@@ -145,6 +145,56 @@ pub const comptime_colors = struct {
     pub inline fn bg(comptime color: Color) []const u8 {
         comptime return color16(color, .background);
     }
+
+    // 16 colors
+    pub inline fn black(comptime text: TextColor) []const u8 {
+        comptime return color16(.black, text);
+    }
+    pub inline fn brightBlack(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_black, text);
+    }
+    pub inline fn red(comptime text: TextColor) []const u8 {
+        comptime return color16(.red, text);
+    }
+    pub inline fn brightRed(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_red, text);
+    }
+    pub inline fn green(comptime text: TextColor) []const u8 {
+        comptime return color16(.green, text);
+    }
+    pub inline fn brightGreen(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_green, text);
+    }
+    pub inline fn yellow(comptime text: TextColor) []const u8 {
+        comptime return color16(.yellow, text);
+    }
+    pub inline fn brightYellow(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_yellow, text);
+    }
+    pub inline fn blue(comptime text: TextColor) []const u8 {
+        comptime return color16(.blue, text);
+    }
+    pub inline fn brightBlue(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_blue, text);
+    }
+    pub inline fn magenta(comptime text: TextColor) []const u8 {
+        comptime return color16(.magenta, text);
+    }
+    pub inline fn brightMagenta(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_magenta, text);
+    }
+    pub inline fn cyan(comptime text: TextColor) []const u8 {
+        comptime return color16(.cyan, text);
+    }
+    pub inline fn brightCyan(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_cyan, text);
+    }
+    pub inline fn white(comptime text: TextColor) []const u8 {
+        comptime return color16(.white, text);
+    }
+    pub inline fn brightWhite(comptime text: TextColor) []const u8 {
+        comptime return color16(.bright_white, text);
+    }
 };
 
 pub fn createColors(config: Config) Colors {
