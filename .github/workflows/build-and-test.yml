@@ -13,6 +13,7 @@ on:
       - .github/**
       - '!.github/workflows/build-and-test.yml'
       - .vscode/**
+      - images/**
   pull_request:
     paths-ignore:
       - .editorconfig
@@ -23,6 +24,7 @@ on:
       - .github/**
       - '!.github/workflows/build-and-test.yml'
       - .vscode/**
+      - images/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
