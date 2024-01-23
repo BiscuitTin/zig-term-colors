@@ -6,4 +6,5 @@
 # Zig
 zig-cache/
 zig-out/
+coverage/
 docs/

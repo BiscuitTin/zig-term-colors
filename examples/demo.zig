@@ -9,7 +9,8 @@ const comptime_colors_demo = struct {
 
         inline for (@typeInfo(term_colors.Color).Enum.fields) |c| {
             const color: term_colors.Color = @enumFromInt(c.value);
-            std.debug.print("{s} {d} {s}", .{ colors.fg(color), c.value, colors.default(.foreground) });
+            const str = colors.print(color, .foreground, " {d} ", .{c.value});
+            std.debug.print("{s}", .{str});
         }
 
         std.debug.print("{s} - ({d}) {s}\n", .{ colors.reset(), id, name });
@@ -23,7 +24,7 @@ const comptime_colors_demo = struct {
             if (id == 9) if (c.value < 40) continue;
 
             const color: term_colors.Color = @enumFromInt(c.value);
-            std.debug.print("{s}        {s}", .{ colors.bg(color), colors.default(.background) });
+            std.debug.print("{s}{d:^8}{s}", .{ colors.bg(color), c.value, colors.default(.background) });
         }
 
         std.debug.print("{s} - ({d}x) {s}\n", .{ colors.reset(), id, name });
@@ -54,7 +55,7 @@ const runtime_colors_demo = struct {
     fn printColorCodeCells(colors: term_colors.Colors, writer: anytype, id: u8, name: []const u8) !void {
         inline for (@typeInfo(term_colors.Color).Enum.fields) |c| {
             const color: term_colors.Color = @enumFromInt(c.value);
-            try colors.fg(writer, color);
+            try colors.setColor(writer, color);
             try writer.print(" {d} ", .{c.value});
             try colors.default(writer, .foreground);
         }
@@ -69,9 +70,7 @@ const runtime_colors_demo = struct {
             if (id == 9) if (c.value < 40) continue;
 
             const color: term_colors.Color = @enumFromInt(c.value);
-            try colors.bg(writer, color);
-            try writer.print("        ", .{});
-            try colors.default(writer, .background);
+            try colors.print(writer, .{ color, .background }, "{d:^8}", .{c.value});
         }
 
         try colors.reset(writer);
