@@ -569,4 +569,49 @@ test "create colors function" {
         try colors.default(fbs.writer(), .foreground);
         try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
     }
+    fbs.reset();
+    {
+        // windows api
+        const file = std.io.getStdErr();
+        const windows = std.os.windows;
+        const builtin = @import("builtin");
+        const native_os = builtin.os.tag;
+        const info: windows.CONSOLE_SCREEN_BUFFER_INFO = undefined;
+        const tty_config = std.io.tty.Config{ .windows_api = if (native_os == .windows) .{
+            .handle = file.handle,
+            .reset_attributes = info.wAttributes,
+        } else {} };
+        const colors = termColors.createColors(tty_config);
+
+        const expected = "";
+        try colors.default(fbs.writer(), .foreground);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+}
+
+test "no color" {
+    var buffer: [8]u8 = undefined;
+    var fbs = std.io.fixedBufferStream(&buffer);
+    const tty_config = std.io.tty.Config{ .no_color = {} };
+    const colors = termColors.createColors(tty_config);
+    {
+        // no color
+        const expected = "";
+        try colors.setColor(fbs.writer(), .red);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no reset
+        const expected = "";
+        try colors.reset(fbs.writer());
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
+    fbs.reset();
+    {
+        // no font styles
+        const expected = "";
+        try colors.bold(fbs.writer(), true);
+        try std.testing.expectEqualSlices(u8, expected, fbs.getWritten());
+    }
 }
