@@ -51,3 +51,17 @@ jobs:
 
       - name: Build and test
         run: zig build test
+
+      - name: Install kcov
+        run: |
+          sudo apt update \
+          sudo apt install -y kcov
+
+      - name: Generate coverage reports
+        run: kcov $PWD/coverage ./zig-cache/o/*/test
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage/
+          verbose: true

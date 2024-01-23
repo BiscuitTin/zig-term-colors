@@ -10,7 +10,7 @@
 
 # Zig terminal colors
 
-A simple library for working with terminal formatting and colors in Zig.
+A simple library for ANSI terminal colors and styles in Zig.
 
 <details>
 

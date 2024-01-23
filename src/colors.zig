@@ -12,19 +12,6 @@ pub const Colors = union(enum) {
     no_color,
     escape_codes,
 
-    pub fn default(conf: Colors, writer: anytype, text: TextColor) !void {
-        nosuspend switch (conf) {
-            .no_color => return,
-            .escape_codes => {
-                const str: []const u8 = switch (text) {
-                    .foreground => CSI ++ "39m",
-                    .background => CSI ++ "49m",
-                };
-                try writer.writeAll(str);
-            },
-        };
-    }
-
     pub fn color16(conf: Colors, writer: anytype, color: Color, text: TextColor) !void {
         nosuspend switch (conf) {
             .no_color => return,
@@ -45,68 +32,65 @@ pub const Colors = union(enum) {
         try default(conf, writer, color[1]);
     }
 
-    pub fn setColor(conf: Colors, out_stream: anytype, color: Color, text: TextColor) !void {
-        return color16(conf, out_stream, color, text);
+    /// Example:
+    /// ```zig
+    /// // set text color to red
+    /// try colors.setColor(writer, .red);
+    /// ```
+    pub fn setColor(conf: Colors, out_stream: anytype, color: Color) !void {
+        return color16(conf, out_stream, color, .foreground);
     }
 
+    /// Example:
+    /// ```zig
+    /// // set background color to red
+    /// try colors.setBackgroundColor(writer, .red);
+    /// ```
+    pub fn setBackgroundColor(conf: Colors, out_stream: anytype, color: Color) !void {
+        return color16(conf, out_stream, color, .background);
+    }
+
+    /// Example:
+    /// ```zig
+    /// // set text color to red
+    /// try colors.fg(writer, .red);
+    /// ```
     pub fn fg(conf: Colors, writer: anytype, color: Color) !void {
         return color16(conf, writer, color, .foreground);
     }
 
+    /// Example:
+    /// ```zig
+    /// // set background color to red
+    /// try colors.bg(writer, .red);
+    /// ```
     pub fn bg(conf: Colors, writer: anytype, color: Color) !void {
         return color16(conf, writer, color, .background);
     }
 
-    // 16 colors
-    pub fn black(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .black, text);
-    }
-    pub fn brightBlack(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_black, text);
-    }
-    pub fn red(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .red, text);
-    }
-    pub fn brightRed(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_red, text);
-    }
-    pub fn green(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .green, text);
-    }
-    pub fn brightGreen(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_green, text);
-    }
-    pub fn yellow(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .yellow, text);
-    }
-    pub fn brightYellow(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_yellow, text);
-    }
-    pub fn blue(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .blue, text);
-    }
-    pub fn brightBlue(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_blue, text);
-    }
-    pub fn magenta(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .magenta, text);
-    }
-    pub fn brightMagenta(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_magenta, text);
-    }
-    pub fn cyan(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .cyan, text);
-    }
-    pub fn brightCyan(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_cyan, text);
-    }
-    pub fn white(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .white, text);
-    }
-    pub fn brightWhite(conf: Colors, writer: anytype, text: TextColor) !void {
-        return color16(conf, writer, .bright_white, text);
+    /// Example:
+    /// ```zig
+    /// // set text color to terminal default
+    /// try colors.default(writer, .foreground);
+    /// ```
+    pub fn default(conf: Colors, writer: anytype, text: TextColor) !void {
+        nosuspend switch (conf) {
+            .no_color => return,
+            .escape_codes => {
+                const str: []const u8 = switch (text) {
+                    .foreground => CSI ++ "39m",
+                    .background => CSI ++ "49m",
+                };
+                try writer.writeAll(str);
+            },
+        };
     }
 
+    /// Example:
+    /// ```zig
+    /// // reset all colors and styles
+    /// try colors.reset(writer);
+    /// ```
     pub fn reset(conf: Colors, writer: anytype) !void {
         nosuspend switch (conf) {
             .no_color => return,
@@ -126,40 +110,81 @@ pub const Colors = union(enum) {
             },
         };
     }
+
+    /// Example:
+    /// ```zig
+    /// // set bold font
+    /// try colors.bold(writer, true);
+    /// ```
     pub fn bold(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "1m", "22m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // set dim(faint) font
+    /// try colors.dim(writer, true);
+    /// ```
     pub fn dim(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "2m", "22m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // set italic font
+    /// try colors.italic(writer, true);
+    /// ```
     pub fn italic(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "3m", "23m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // add underline to text
+    /// try colors.underline(writer, true);
+    /// ```
     pub fn underline(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "4m", "24m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // blink the text
+    /// try colors.blink(writer, true);
+    /// ```
     pub fn blink(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "5m", "25m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // swap foreground and background colors
+    /// try colors.inverse(writer, true);
+    /// ```
     pub fn inverse(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "7m", "27m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // hide text
+    /// try colors.hidden(writer, true);
+    /// ```
     pub fn hidden(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "8m", "28m");
     }
+
+    /// Example:
+    /// ```zig
+    /// // add strikethrough to text
+    /// try colors.strikethrough(writer, true);
+    /// ```
     pub fn strikethrough(conf: Colors, writer: anytype, set: bool) !void {
         return style(conf, writer, set, "9m", "29m");
     }
 };
 
 pub const comptime_colors = struct {
-    pub inline fn default(comptime text: TextColor) []const u8 {
-        comptime return switch (text) {
-            .foreground => CSI ++ "39m",
-            .background => CSI ++ "49m",
-        };
-    }
-
     pub inline fn color16(comptime color: Color, comptime text: TextColor) []const u8 {
         comptime {
             const color_number = @intFromEnum(color);
@@ -188,54 +213,11 @@ pub const comptime_colors = struct {
         comptime return color16(color, .background);
     }
 
-    // 16 colors
-    pub inline fn black(comptime text: TextColor) []const u8 {
-        comptime return color16(.black, text);
-    }
-    pub inline fn brightBlack(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_black, text);
-    }
-    pub inline fn red(comptime text: TextColor) []const u8 {
-        comptime return color16(.red, text);
-    }
-    pub inline fn brightRed(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_red, text);
-    }
-    pub inline fn green(comptime text: TextColor) []const u8 {
-        comptime return color16(.green, text);
-    }
-    pub inline fn brightGreen(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_green, text);
-    }
-    pub inline fn yellow(comptime text: TextColor) []const u8 {
-        comptime return color16(.yellow, text);
-    }
-    pub inline fn brightYellow(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_yellow, text);
-    }
-    pub inline fn blue(comptime text: TextColor) []const u8 {
-        comptime return color16(.blue, text);
-    }
-    pub inline fn brightBlue(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_blue, text);
-    }
-    pub inline fn magenta(comptime text: TextColor) []const u8 {
-        comptime return color16(.magenta, text);
-    }
-    pub inline fn brightMagenta(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_magenta, text);
-    }
-    pub inline fn cyan(comptime text: TextColor) []const u8 {
-        comptime return color16(.cyan, text);
-    }
-    pub inline fn brightCyan(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_cyan, text);
-    }
-    pub inline fn white(comptime text: TextColor) []const u8 {
-        comptime return color16(.white, text);
-    }
-    pub inline fn brightWhite(comptime text: TextColor) []const u8 {
-        comptime return color16(.bright_white, text);
+    pub inline fn default(comptime text: TextColor) []const u8 {
+        comptime return switch (text) {
+            .foreground => CSI ++ "39m",
+            .background => CSI ++ "49m",
+        };
     }
 
     pub inline fn reset() []const u8 {
@@ -272,6 +254,20 @@ pub const comptime_colors = struct {
     }
 };
 
+/// Example:
+/// ```zig
+/// const stderr_file = std.io.getStdErr();
+/// const stderr_writer = stderr_file.writer();
+/// var bw = std.io.bufferedWriter(stderr_writer);
+/// const stderr = bw.writer();
+///
+/// const tty_config = std.io.tty.detectConfig(stderr_file);
+/// const colors = createColors(tty_config);
+/// try colors.setColor(stderr, .red);
+/// try stderr.print("This is a red text", .{});
+///
+/// try bw.flush();
+/// ```
 pub fn createColors(config: Config) Colors {
     nosuspend switch (config) {
         .no_color => return .no_color,
