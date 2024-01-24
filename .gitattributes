@@ -1,1 +1,4 @@
 *.zig text eol=lf
+
+[core]
+	autocrlf = false
