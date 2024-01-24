@@ -1,4 +1,2 @@
 *.zig text eol=lf
-
-[core]
-	autocrlf = false
+*.zon text eol=lf
