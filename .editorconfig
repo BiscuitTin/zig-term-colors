@@ -21,3 +21,7 @@ max_line_length = 100
 
 [*.zig.zon]
 indent_size = 4
+
+[.gitattributes]
+indent_size = 4
+indent_style = tab

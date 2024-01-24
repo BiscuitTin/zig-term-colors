@@ -33,9 +33,10 @@ concurrency:
 jobs:
   build-and-test:
     name: Build & test w/zig
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         version: ['master']
 
     steps:
@@ -53,14 +54,17 @@ jobs:
         run: zig build test
 
       - name: Install kcov
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y kcov
 
       - name: Generate coverage reports
+        if: matrix.os == 'ubuntu-latest'
         run: kcov $PWD/coverage ./zig-cache/o/*/test
 
       - name: Upload coverage reports to Codecov
+        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
         with:
           directory: ./coverage/
