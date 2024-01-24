@@ -33,9 +33,10 @@ concurrency:
 jobs:
   build-and-test:
     name: Build & test w/zig
-    runs-on: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         version: ['master']
 
     steps:
