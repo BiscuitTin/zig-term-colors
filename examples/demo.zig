@@ -13,7 +13,7 @@ const comptime_colors_demo = struct {
             std.debug.print("{s}", .{str});
         }
 
-        std.debug.print("{s} - ({d}) {s}\n", .{ colors.reset(), id, name });
+        std.debug.print("{s} - ({d}) {s}\r\n", .{ colors.reset(), id, name });
     }
 
     fn printColorCells(id: comptime_int, comptime name: []const u8) void {
@@ -27,11 +27,11 @@ const comptime_colors_demo = struct {
             std.debug.print("{s}{d:^8}{s}", .{ colors.bg(color), c.value, colors.default(.background) });
         }
 
-        std.debug.print("{s} - ({d}x) {s}\n", .{ colors.reset(), id, name });
+        std.debug.print("{s} - ({d}x) {s}\r\n", .{ colors.reset(), id, name });
     }
 
     pub fn print() void {
-        std.debug.print("{s:-^64}\n", .{"foreground text colors and font styles"});
+        std.debug.print("{s:-^64}\r\n", .{"foreground text colors and font styles"});
 
         const colors = term_colors.comptime_colors;
         printColorCodeCells("", 0, "normal");
@@ -44,7 +44,7 @@ const comptime_colors_demo = struct {
         printColorCodeCells(colors.hidden(true), 8, "hidden");
         printColorCodeCells(colors.strikethrough(true), 9, "strikethrough");
 
-        std.debug.print("\n{s:-^64}\n", .{"normal and bright background colors"});
+        std.debug.print("\r\n{s:-^64}\r\n", .{"normal and bright background colors"});
 
         printColorCells(3, "normal");
         printColorCells(9, "bright");
@@ -61,7 +61,7 @@ const runtime_colors_demo = struct {
         }
 
         try colors.reset(writer);
-        try writer.print(" - ({d}) {s}\n", .{ id, name });
+        try writer.print(" - ({d}) {s}\r\n", .{ id, name });
     }
 
     fn printColorCells(colors: term_colors.Colors, writer: anytype, id: comptime_int, name: []const u8) !void {
@@ -74,7 +74,7 @@ const runtime_colors_demo = struct {
         }
 
         try colors.reset(writer);
-        try writer.print(" - ({d}x) {s}\n", .{ id, name });
+        try writer.print(" - ({d}x) {s}\r\n", .{ id, name });
     }
 
     pub fn print() !void {
@@ -85,7 +85,7 @@ const runtime_colors_demo = struct {
         const tty_config = std.io.tty.detectConfig(stderr_file);
         const colors = term_colors.createColors(tty_config);
 
-        try stderr.print("{s:-^64}\n", .{"foreground text colors and font styles"});
+        try stderr.print("{s:-^64}\r\n", .{"foreground text colors and font styles"});
 
         try printColorCodeCells(colors, stderr, 0, "normal");
         try colors.bold(stderr, true);
@@ -105,7 +105,7 @@ const runtime_colors_demo = struct {
         try colors.strikethrough(stderr, true);
         try printColorCodeCells(colors, stderr, 9, "strikethrough");
 
-        try stderr.print("\n{s:-^64}\n", .{"normal and bright background colors"});
+        try stderr.print("\r\n{s:-^64}\r\n", .{"normal and bright background colors"});
 
         try printColorCells(colors, stderr, 3, "normal");
         try printColorCells(colors, stderr, 9, "bright");
@@ -115,13 +115,13 @@ const runtime_colors_demo = struct {
 };
 
 pub fn main() !void {
-    std.debug.print("\n{s:=^64}\n\n", .{" Comptime "});
+    std.debug.print("\r\n{s:=^64}\r\n\r\n", .{" Comptime "});
 
     comptime_colors_demo.print();
 
-    std.debug.print("\n{s:=^64}\n\n", .{" Runtime "});
+    std.debug.print("\r\n{s:=^64}\r\n\r\n", .{" Runtime "});
 
     try runtime_colors_demo.print();
 
-    std.debug.print("\n", .{});
+    std.debug.print("\r\n", .{});
 }
